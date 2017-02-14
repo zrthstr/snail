@@ -15,15 +15,13 @@ FACTOR = 12
 
 FPS = 5
 
-player = [10,20]
-wall=[[1,3],[3,4],[5,6],[LEN-5,4],[LEN-5,12]]
-snake=[[[14,15],[14,16],[14,17],[15,17],[16,17],[17,17],[18,17]],
-        [[26,21],[26,22],[26,23],[26,24],[26,25]],
-        [[55,7],[55,8],[55,9]]
-        ]
+player = []
+wall = []
+snake = []
 
-wall_movable = [True,True,False,True,True]
-snake_growing = [False, False, 10]
+wall_movable = []
+snake_growing = []
+
 
 BLUE   = (  0,  0,255)
 GREEN  = (  0,255,  0)
@@ -33,9 +31,6 @@ RED    = (255,  0,  0)
 size = 20
 not_full = 0
 
-SNAKE_POPULATION = 10
-SNAKE_MIN_L = 3
-SNAKE_MAX_L = 10
 
 DIRECTION = {
         "RIGHT": ( 1, 0),
@@ -44,7 +39,10 @@ DIRECTION = {
         "DOWN":  ( 0, 1)
         }
 
+# likelyness that snake will chnage direction
 SNAKE_RANDOM = 7
+SNAKE_MIN_L = 3
+SNAKE_MAX_L = 10
 
 # color, size, no_fill
 obj_size = int(FACTOR / 2)
@@ -55,26 +53,48 @@ prop = {"player":  (RED,    obj_size, False),
         "snake_h": (DGREEN, obj_size, False)}
 
 def test():
+    global player
+    global wall
+    global snake
+   
+    global wall_movable
+    global snake_growing
+    player=[10,20]
+    wall=[[1,3],[3,4],[5,6],[LEN-5,4],[LEN-5,12]]
+    snake=[[[14,15],[14,16],[14,17],[15,17],[16,17],[17,17],[18,17]],
+        [[26,21],[26,22],[26,23],[26,24],[26,25]],
+        [[55,7],[55,8],[55,9]]
+        ]
 
-    def build_wall():
-        for x in [2, LEN-6, LEN-4]:
-            for y in range(0,HIGHT):
-                wall.append([x,y])
-                wall_movable.append(False)
+    SNAKE_POPULATION = 10
+    SNAKE_MIN_L = 3
+    SNAKE_MAX_L = 10
+
+    wall_movable = [True,True,False,True,True]
+    snake_growing = [False, False, 10]
+
+    build_snakes(SNAKE_POPULATION, SNAKE_MIN_L)
+    build_wall()
+
+
+def build_wall():
+    for x in [2, LEN-6, LEN-4]:
+        for y in range(0,HIGHT):
+            wall.append([x,y])
+            wall_movable.append(False)
         
-        for y in [int(HIGHT/2 -6), int(HIGHT/2 +6)]:
-            for x in range(0,LEN):
-                wall.append([x,y])
-                wall_movable.append(True)
+    for y in [int(HIGHT/2 -6), int(HIGHT/2 +6)]:
+        for x in range(0,LEN):
+            wall.append([x,y])
+            wall_movable.append(True)
 
 
-def build_snakes():
+def build_snakes(SNAKE_POPULATION, SNAKE_MIN_L):
     for s in range(0, SNAKE_POPULATION):
         snake.append([[random.randint(0,LEN), random.randint(1,HIGHT)]])
         leng = random.randint(SNAKE_MIN_L, SNAKE_MIN_L)
         snake_growing.append(leng) 
 
-build_snakes()
 
 def right(obj):
     return [obj[0] + 1, obj[1]]
@@ -167,6 +187,7 @@ def snake_step(direc, i):
         snake[i] = snake[i][::-1]
     else:
         snake[i].insert(0, move_to(direc, snake[i][0]))
+        print("iiii:",i)
         if snake_growing[i] > 0:
             snake_growing[i] -=1
         else:
@@ -193,6 +214,7 @@ def game_over():
     time.sleep(1)
     sys.exit()
 
+
 def cut_snake(cut):
     for i, s in enumerate(snake):
         for ii, ss in enumerate(s):
@@ -210,6 +232,7 @@ def cut_snake(cut):
                 #    print(s)
                 break
 
+
 def push_wall(player, brick):
     ### the palyer is trying to walk from start to step
     ### pushing wawai the ston laying on step furter onto "to"
@@ -223,6 +246,7 @@ def push_wall(player, brick):
     brick_number = wall.index(brick)
     wall[brick_number] = new_brick
     return brick
+
 
 def move_player(key):
     global player
@@ -250,25 +274,27 @@ def move_player(key):
 
 
 def draw_obj(obj, pos):
+    print("draw_obj:",pos)
     x = pos[0] * FACTOR
     y = pos[1] * FACTOR
     color, size, not_full = prop[obj]
     pygame.draw.circle(screen, color, (x, y), size, not_full)
 
 def draw_player():
+    print("player:",player)
     draw_obj("player",player)
 
 def draw_wall():
-    for i, w in enumerate(wall):
+    for i, brick in enumerate(wall):
         if wall_movable[i]:
-            draw_obj("wall_movable", w)
+            draw_obj("wall_movable", brick)
         else:
-            draw_obj("wall", w)
+            draw_obj("wall", brick)
 
 def draw_snake():
     for one in snake:
-        for s in one[1:]:
-            draw_obj("snake", s)
+        for body_part in one[1:]:
+            draw_obj("snake", body_part)
         draw_obj("snake_h",one[0]) # head in dgreen
 
 
@@ -301,16 +327,46 @@ def parse_levelfile(content):
         sys.exit("error, quitting. level file has has number of lines.\n\
                 expected %d lines. %d found." % (HIGHT, len(content)))
     for i, line in enumerate(content):
-        if not line == LEN:
+        if not len(line) == LEN:
+            print("LLLAST LINE:",line,":", len(line))
             sys.exit("error, quitting. level file has line with bad lenght.\n\
-                    in line %d. expected %d char. %d found." % (i+1, LEN, len(line)))
+                    in line %d. expected %d char. %d found." % (i, LEN, len(line)))
+
+    global player
+    global wall
+    global snake
+    global wall_movable
+    global snake_growing
+
+    player = [[i, player.index("P")] for i, player in enumerate(content) if "P" in player ][0]
+
+    for x, line in enumerate(content):
+        for y, char in enumerate(line):
+            if char == "P":
+                player = [x,y]
+            elif char == "W":
+                wall.append([x,y])
+                wall_movable.append(False)
+            elif char == "V":
+                wall.append([x,y])
+                wall_movable.append(True)
+            elif char == "H":
+                snake.append([[x,y]])
+                snake_growing.append(random.randint(SNAKE_MIN_L, SNAKE_MAX_L))
+    print("found in level file......") 
+    print("player:",player)
+    print("wall:",wall)
+    print("snakheads:",snake)
+
+
+    print("level loaded:")
 
 
 def write_level(level, name):
     if os.path.exists(name):
         sys.exit("quitting. cant generate level: %s. File exists allready" % name)
     with open(name, mode="wt", encoding="utf-8") as level_file:
-        level_file.write("\n".join(level))
+        level_file.write('\n'.join(level))
     return True
 
 
@@ -327,19 +383,22 @@ def generate_level(name):
     VOID = [" "] * VOID_COUNT
 
     level = SNAKEHEAD + WALL + VWALL + VOID + PLAYER
+    print("LLLLLLLLLL:",len(level))
     random.shuffle(level)
 
     level_s = []
     for i in range(0,len(level), LEN):
-        level_s.append(level[i:i+LEN])
+        #print("iii",i)
+        #print("LLLSSs",level_s)
+        level_s.append("".join(level[i:i+LEN]))
 
-    print(level)
+    #print(level)
     print("s",level_s)
     #raise("22")
 
-    if not write_level(level, name):
-        raise("error writing level:",level)
-    print("level created and saved in file:", level)
+    if not write_level(level_s, name):
+        raise("error writing level:",name)
+    print("level created and saved in file:", name)
 
 
 def game_setup():
@@ -350,7 +409,9 @@ def game_setup():
 
 
     if len(sys.argv) == 1:
+        print("running in test mode:")
         test()
+        print("player:",player)
 
     elif len(sys.argv) == 3:
         if sys.argv[1] == "--genlevel":
@@ -364,11 +425,11 @@ def game_setup():
 
         if os.path.isfile(level):
             print("loading level file:", level)
-            file_content = [line.rstrip() for line in open(level)]
+            file_content = [line.rstrip('\n') for line in open(level)]
             print(file_content)
             parse_levelfile(file_content)
         else:
-            sys.exit("level file does not exist:", level)
+            sys.exit("level file does not exist: " + level)
 
 
     return font, screen
