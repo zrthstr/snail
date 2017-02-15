@@ -1,3 +1,5 @@
+#!/usr/bin/env python3
+
 import pygame
 from pygame.locals import *
 
@@ -370,6 +372,13 @@ def write_level(level, name):
     return True
 
 
+
+def write_level_file(level_s, name):
+    if not write_level(level_s, name):
+        raise("error writing level:",name)
+    print("level created and saved in file:", name)
+
+
 def generate_level(name):
     SNAKE_COUNT = 20 
     WALL_COUNT = 200
@@ -383,22 +392,33 @@ def generate_level(name):
     VOID = [" "] * VOID_COUNT
 
     level = SNAKEHEAD + WALL + VWALL + VOID + PLAYER
-    print("LLLLLLLLLL:",len(level))
     random.shuffle(level)
 
     level_s = []
     for i in range(0,len(level), LEN):
-        #print("iii",i)
-        #print("LLLSSs",level_s)
         level_s.append("".join(level[i:i+LEN]))
 
-    #print(level)
-    print("s",level_s)
-    #raise("22")
+    if not name:
+        print("in memory creat mode", level_s)
+        return level_s
+    else:
+        print("writing generated level to file",name)
+        ## gen level and wirte to file name
+        write_level_file(level_s, name)
 
-    if not write_level(level_s, name):
-        raise("error writing level:",name)
-    print("level created and saved in file:", name)
+def init_game(game_type, level=False ):
+    if game_type == "test":
+        test()
+    elif game_type == "random":
+        level = generate_level(False)
+        parse_levelfile(level)
+    elif game_type == "level":
+        if os.path.isfile(level):
+            file_content = [line.rstrip('\n') for line in open(level)]
+            parse_levelfile(file_content)
+        else:
+            sys.exit("error, file not found:" + level)
+
 
 
 def game_setup():
@@ -409,28 +429,35 @@ def game_setup():
 
 
     if len(sys.argv) == 1:
-        print("running in test mode:")
-        test()
-        print("player:",player)
+        print("running in random game mode mode:")
+        init_game("random")
+
+    elif len(sys.argv) == 2:
+        if sys.argv[1] == "--test":
+            print("running in test mode:")
+            init_game("test")
+        elif sys.argv[1] == "--level":
+            usage()
+        else:
+            level = sys.argv[1]
+
+            if os.path.isfile(level):
+                print("loading level file:", level)
+                file_content = [line.rstrip('\n') for line in open(level)]
+                print(file_content)
+                parse_levelfile(file_content)
+            else:
+                sys.exit("level file does not exist: " + level)
 
     elif len(sys.argv) == 3:
         if sys.argv[1] == "--genlevel":
             generate_level(sys.argv[2])
-            sys.exit()
+            #sys.exit()
+        elif sys.argv[2] == "--level":
+            level = sys.argv[1]
+            init_game("level",level)
         else:
-            sys.exit("args not known")
-
-    elif len(sys.argv) == 2:
-        level = sys.argv[1]
-
-        if os.path.isfile(level):
-            print("loading level file:", level)
-            file_content = [line.rstrip('\n') for line in open(level)]
-            print(file_content)
-            parse_levelfile(file_content)
-        else:
-            sys.exit("level file does not exist: " + level)
-
+            usage()
 
     return font, screen
 
