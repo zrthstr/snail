@@ -279,7 +279,7 @@ def move_player(key):
             new_player = player
     player = new_player
 
-    if len(snakes) == 0:
+    if len(snake) == 0:
         ### all snakes dead. you win!
         game_win()
 
@@ -431,7 +431,9 @@ def init_game(game_type, level=False ):
             sys.exit("error, file not found:" + level)
 
 def usage():
-    print("./", sys.argv[0], "[--level <level_file> or --genlevel <level_file> or --test]")
+    print(sys.argv[0], " [--level <level_file> or --genlevel <level_file> or --test]")
+    sys.exit()
+
 
 def game_setup():
     pygame.init()
@@ -447,16 +449,18 @@ def game_setup():
         if sys.argv[1] == "--test":
             print("running in test mode:")
             init_game("test")
-
-        elif sys.argv[1] == "--level":
-            usage()
-
-        elif sys.argv[1] == "--help" or sys.argv[1] == "-h":
-            usage()
-
         else:
-            level = sys.argv[1]
-            init_game("level", level=level)
+            usage()
+
+        #elif sys.argv[1] == "--level":
+        #    usage()
+
+        #elif sys.argv[1] == "--help" or sys.argv[1] == "-h":
+        #    usage()
+
+        #else:
+        #    level = sys.argv[1]
+        #    init_game("level", level=level)
             #if os.path.isfile(level):
             #    print("loading level file:", level)
             #    file_content = [line.rstrip('\n') for line in open(level)]
@@ -468,9 +472,10 @@ def game_setup():
     elif len(sys.argv) == 3:
         if sys.argv[1] == "--genlevel":
             generate_level(sys.argv[2])
-            #sys.exit()
-        elif sys.argv[2] == "--level":
-            level = sys.argv[1]
+            sys.exit()
+        elif sys.argv[1] == "--level":
+            level = sys.argv[2]
+            print("loading level:", level)
             init_game("level",level)
         else:
             usage()
