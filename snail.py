@@ -189,7 +189,7 @@ def snake_step(direc, i):
         snake[i] = snake[i][::-1]
     else:
         snake[i].insert(0, move_to(direc, snake[i][0]))
-        print("iiii:",i)
+        #print("iiii:",i)
         if snake_growing[i] > 0:
             snake_growing[i] -=1
         else:
@@ -227,12 +227,12 @@ def cut_snake(cut):
         for ii, ss in enumerate(s):
             if cut == ss:
                 if ii == 0:
-                    print("CUT kill--  i:",i,"ii:",ii,"s:",s,"ss:",ss)
+                    #print("CUT kill--  i:",i,"ii:",ii,"s:",s,"ss:",ss)
                     del snake[i]
                     del snake_growing[i]
                 else:
-                    print("CUT cut--  i:",i,"ii:",ii,"s:",s,"ss:",ss)
-                    print("cutting snake[i]:", snake[i], "to:", snake[i][:i])
+                    #print("CUT cut--  i:",i,"ii:",ii,"s:",s,"ss:",ss)
+                    #print("cutting snake[i]:", snake[i], "to:", snake[i][:i])
                     snake[i] = snake[i][:ii]
                 #print("snakes:")
                 #for i, s in enumerate(snake):
@@ -286,14 +286,14 @@ def move_player(key):
 
 
 def draw_obj(obj, pos):
-    print("draw_obj:",pos)
+    #print("draw_obj:",pos)
     x = pos[0] * FACTOR
     y = pos[1] * FACTOR
     color, size, not_full = prop[obj]
     pygame.draw.circle(screen, color, (x, y), size, not_full)
 
 def draw_player():
-    print("player:",player)
+    #print("player:",player)
     draw_obj("player",player)
 
 def draw_wall():
@@ -340,7 +340,7 @@ def parse_levelfile(content):
                 expected %d lines. %d found." % (HIGHT, len(content)))
     for i, line in enumerate(content):
         if not len(line) == LEN:
-            print("LLLAST LINE:",line,":", len(line))
+            #print("LLLAST LINE:",line,":", len(line))
             sys.exit("error, quitting. level file has line with bad lenght.\n\
                     in line %d. expected %d char. %d found." % (i, LEN, len(line)))
 
@@ -437,7 +437,7 @@ def usage():
 
 def game_setup():
     pygame.init()
-    screen = pygame.display.set_mode( (LEN * FACTOR, HIGHT * FACTOR) )
+    screen = pygame.display.set_mode( (LEN * FACTOR +20, HIGHT * FACTOR +20) )
     pygame.display.set_caption(TITLE)
     font = pygame.font.Font(None, 17)
 
