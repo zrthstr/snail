@@ -216,6 +216,11 @@ def game_over():
     time.sleep(1)
     sys.exit()
 
+def game_win():
+    print("congratulations. you winn. go buy your selve a cake")
+    time.sleep(2)
+    sys.exit()
+
 
 def cut_snake(cut):
     for i, s in enumerate(snake):
@@ -273,6 +278,11 @@ def move_player(key):
             # wall not movable, everything stays
             new_player = player
     player = new_player
+
+    if len(snakes) == 0:
+        ### all snakes dead. you win!
+        game_win()
+
 
 
 def draw_obj(obj, pos):
@@ -406,6 +416,7 @@ def generate_level(name):
         ## gen level and wirte to file name
         write_level_file(level_s, name)
 
+
 def init_game(game_type, level=False ):
     if game_type == "test":
         test()
@@ -419,14 +430,14 @@ def init_game(game_type, level=False ):
         else:
             sys.exit("error, file not found:" + level)
 
-
+def usage():
+    print("./", sys.argv[0], "[--level <level_file> or --genlevel <level_file> or --test]")
 
 def game_setup():
     pygame.init()
     screen = pygame.display.set_mode( (LEN * FACTOR, HIGHT * FACTOR) )
     pygame.display.set_caption(TITLE)
     font = pygame.font.Font(None, 17)
-
 
     if len(sys.argv) == 1:
         print("running in random game mode mode:")
@@ -436,18 +447,23 @@ def game_setup():
         if sys.argv[1] == "--test":
             print("running in test mode:")
             init_game("test")
+
         elif sys.argv[1] == "--level":
             usage()
+
+        elif sys.argv[1] == "--help" or sys.argv[1] == "-h":
+            usage()
+
         else:
             level = sys.argv[1]
-
-            if os.path.isfile(level):
-                print("loading level file:", level)
-                file_content = [line.rstrip('\n') for line in open(level)]
-                print(file_content)
-                parse_levelfile(file_content)
-            else:
-                sys.exit("level file does not exist: " + level)
+            init_game("level", level=level)
+            #if os.path.isfile(level):
+            #    print("loading level file:", level)
+            #    file_content = [line.rstrip('\n') for line in open(level)]
+            #    print(file_content)
+            #    parse_levelfile(file_content)
+            #else:
+            #    sys.exit("level file does not exist: " + level)
 
     elif len(sys.argv) == 3:
         if sys.argv[1] == "--genlevel":
