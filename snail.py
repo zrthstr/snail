@@ -17,7 +17,7 @@ HIGHT = 40
 
 FACTOR = 12
 
-FPS = 5
+FPS = 8
 
 player = []
 wall = []
@@ -370,6 +370,7 @@ def parse_level(content):
             elif char == "H":
                 snake.append([[x,y]])
                 snake_growing.append(random.randint(SNAKE_MIN_L, SNAKE_MAX_L))
+    
     print("player:",player)
     print("wall:",wall)
     print("snakheads:",snake)
@@ -398,15 +399,31 @@ def generate_level(name):
     WALL = ['W'] *  WALL_COUNT
     VWALL = ['V'] * VWALL_COUNT
     PLAYER = ['P'] * 1
-    VOID_COUNT = WIDTH * HIGHT - SNAKE_COUNT - WALL_COUNT - VWALL_COUNT - 1
+    OUTERWALL = 2 * (HIGHT + WIDTH) - 4
+    print("OUT",OUTERWALL)
+    VOID_COUNT = WIDTH * HIGHT - SNAKE_COUNT - WALL_COUNT - VWALL_COUNT - 1 - OUTERWALL
     VOID = [" "] * VOID_COUNT
 
     level = SNAKEHEAD + WALL + VWALL + VOID + PLAYER
     random.shuffle(level)
 
+    ## make sure player is not on outer wall
+
     level_s = []
-    for i in range(0,len(level), WIDTH):
-        level_s.append("".join(level[i:i+WIDTH]))
+    print("LENNN:",len(level))
+
+    for i in range(0,len(level), WIDTH-2):
+        if i == 0:
+            level_s.append("W" * WIDTH)
+            print("...")
+        level_s.append("W" + "".join(level[i:i+WIDTH-2]) + "W")
+    level_s.append("W" * WIDTH)
+
+#    for i in range(0,len(level), WIDTH-2):
+#        if i == 0 or i == HIGHT - 1:
+#            level_s.append("W" * WIDTH)
+#        else:
+#            level_s.append("W" + "".join(level[i:i+WIDTH]) + "W")
 
     if not name:
         print("in memory creat mode", level_s)
@@ -437,7 +454,7 @@ def usage():
 
 def game_setup():
     pygame.init()
-    screen = pygame.display.set_mode( (WIDTH * FACTOR +20, HIGHT * FACTOR +20) )
+    screen = pygame.display.set_mode( (WIDTH * FACTOR - FACTOR , HIGHT * FACTOR - FACTOR) )
     pygame.display.set_caption(TITLE)
     font = pygame.font.Font(None, 17)
 
