@@ -11,8 +11,10 @@ import sys
 
 TITLE="Snail"
 
-LEN = 60
+WIDTH = 60
 HIGHT = 40
+
+
 FACTOR = 12
 
 FPS = 5
@@ -61,8 +63,8 @@ def test():
    
     global wall_movable
     global snake_growing
-    player=[10,20]
-    wall=[[1,3],[3,4],[5,6],[LEN-5,4],[LEN-5,12]]
+    player=[10,30]
+    wall=[[1,3],[3,4],[5,6],[WIDTH-5,4],[WIDTH-5,12]]
     snake=[[[14,15],[14,16],[14,17],[15,17],[16,17],[17,17],[18,17]],
         [[26,21],[26,22],[26,23],[26,24],[26,25]],
         [[55,7],[55,8],[55,9]]
@@ -80,20 +82,20 @@ def test():
 
 
 def build_wall():
-    for x in [2, LEN-6, LEN-4]:
+    for x in [2, WIDTH-6, WIDTH-4]:
         for y in range(0,HIGHT):
             wall.append([x,y])
             wall_movable.append(False)
         
     for y in [int(HIGHT/2 -6), int(HIGHT/2 +6)]:
-        for x in range(0,LEN):
+        for x in range(0,WIDTH):
             wall.append([x,y])
             wall_movable.append(True)
 
 
 def build_snakes(SNAKE_POPULATION, SNAKE_MIN_L):
     for s in range(0, SNAKE_POPULATION):
-        snake.append([[random.randint(0,LEN), random.randint(1,HIGHT)]])
+        snake.append([[random.randint(0,WIDTH), random.randint(1,HIGHT)]])
         leng = random.randint(SNAKE_MIN_L, SNAKE_MIN_L)
         snake_growing.append(leng) 
 
@@ -127,7 +129,7 @@ def collision(new_head):
     ## return True on collision
     x = new_head[0]
     y = new_head[1]
-    if y < 0 or x < 0 or x > LEN or y > HIGHT:
+    if y < 0 or x < 0 or x > WIDTH or y > HIGHT:
         return True
     elif new_head in wall:
         return True
@@ -292,9 +294,11 @@ def draw_obj(obj, pos):
     color, size, not_full = prop[obj]
     pygame.draw.circle(screen, color, (x, y), size, not_full)
 
+
 def draw_player():
     #print("player:",player)
     draw_obj("player",player)
+
 
 def draw_wall():
     for i, brick in enumerate(wall):
@@ -302,6 +306,7 @@ def draw_wall():
             draw_obj("wall_movable", brick)
         else:
             draw_obj("wall", brick)
+
 
 def draw_snake():
     for one in snake:
@@ -334,15 +339,15 @@ def handle_input():
     return last.key
 
 
-def parse_levelfile(content):
+def parse_level(content):
     if not len(content) == HIGHT:
         sys.exit("error, quitting. level file has has number of lines.\n\
                 expected %d lines. %d found." % (HIGHT, len(content)))
     for i, line in enumerate(content):
-        if not len(line) == LEN:
+        if not len(line) == WIDTH:
             #print("LLLAST LINE:",line,":", len(line))
             sys.exit("error, quitting. level file has line with bad lenght.\n\
-                    in line %d. expected %d char. %d found." % (i, LEN, len(line)))
+                    in line %d. expected %d char. %d found." % (i, WIDTH, len(line)))
 
     global player
     global wall
@@ -352,8 +357,8 @@ def parse_levelfile(content):
 
     player = [[i, player.index("P")] for i, player in enumerate(content) if "P" in player ][0]
 
-    for x, line in enumerate(content):
-        for y, char in enumerate(line):
+    for y, line in enumerate(content):
+        for x, char in enumerate(line):
             if char == "P":
                 player = [x,y]
             elif char == "W":
@@ -365,27 +370,22 @@ def parse_levelfile(content):
             elif char == "H":
                 snake.append([[x,y]])
                 snake_growing.append(random.randint(SNAKE_MIN_L, SNAKE_MAX_L))
-    print("found in level file......") 
     print("player:",player)
     print("wall:",wall)
     print("snakheads:",snake)
-
-
-    print("level loaded:")
-
-
-def write_level(level, name):
-    if os.path.exists(name):
-        sys.exit("quitting. cant generate level: %s. File exists allready" % name)
-    with open(name, mode="wt", encoding="utf-8") as level_file:
-        level_file.write('\n'.join(level))
-    return True
-
+    print("level loaded.")
 
 
 def write_level_file(level_s, name):
-    if not write_level(level_s, name):
-        raise("error writing level:",name)
+
+    if os.path.exists(name):
+        sys.exit("quitting. cant generate level: %s. File exists allready" % name)
+
+    with open(name, mode="wt", encoding="utf-8") as level_file:
+        level_file.write('\n'.join(level))
+
+    #if not write_level(level_s, name):
+    #    raise("error writing level:",name)
     print("level created and saved in file:", name)
 
 
@@ -398,15 +398,15 @@ def generate_level(name):
     WALL = ['W'] *  WALL_COUNT
     VWALL = ['V'] * VWALL_COUNT
     PLAYER = ['P'] * 1
-    VOID_COUNT = LEN * HIGHT - SNAKE_COUNT - WALL_COUNT - VWALL_COUNT - 1
+    VOID_COUNT = WIDTH * HIGHT - SNAKE_COUNT - WALL_COUNT - VWALL_COUNT - 1
     VOID = [" "] * VOID_COUNT
 
     level = SNAKEHEAD + WALL + VWALL + VOID + PLAYER
     random.shuffle(level)
 
     level_s = []
-    for i in range(0,len(level), LEN):
-        level_s.append("".join(level[i:i+LEN]))
+    for i in range(0,len(level), WIDTH):
+        level_s.append("".join(level[i:i+WIDTH]))
 
     if not name:
         print("in memory creat mode", level_s)
@@ -422,11 +422,11 @@ def init_game(game_type, level=False ):
         test()
     elif game_type == "random":
         level = generate_level(False)
-        parse_levelfile(level)
+        parse_level(level)
     elif game_type == "level":
         if os.path.isfile(level):
             file_content = [line.rstrip('\n') for line in open(level)]
-            parse_levelfile(file_content)
+            parse_level(file_content)
         else:
             sys.exit("error, file not found:" + level)
 
@@ -437,7 +437,7 @@ def usage():
 
 def game_setup():
     pygame.init()
-    screen = pygame.display.set_mode( (LEN * FACTOR +20, HIGHT * FACTOR +20) )
+    screen = pygame.display.set_mode( (WIDTH * FACTOR +20, HIGHT * FACTOR +20) )
     pygame.display.set_caption(TITLE)
     font = pygame.font.Font(None, 17)
 
@@ -451,23 +451,6 @@ def game_setup():
             init_game("test")
         else:
             usage()
-
-        #elif sys.argv[1] == "--level":
-        #    usage()
-
-        #elif sys.argv[1] == "--help" or sys.argv[1] == "-h":
-        #    usage()
-
-        #else:
-        #    level = sys.argv[1]
-        #    init_game("level", level=level)
-            #if os.path.isfile(level):
-            #    print("loading level file:", level)
-            #    file_content = [line.rstrip('\n') for line in open(level)]
-            #    print(file_content)
-            #    parse_levelfile(file_content)
-            #else:
-            #    sys.exit("level file does not exist: " + level)
 
     elif len(sys.argv) == 3:
         if sys.argv[1] == "--genlevel":
@@ -485,7 +468,6 @@ def game_setup():
 
 
 if __name__ == "__main__":
-
 
     font, screen = game_setup()
     frame = -1
