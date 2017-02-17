@@ -383,7 +383,7 @@ def write_level_file(level_s, name):
         sys.exit("quitting. cant generate level: %s. File exists allready" % name)
 
     with open(name, mode="wt", encoding="utf-8") as level_file:
-        level_file.write('\n'.join(level))
+        level_file.write('\n'.join(level_s))
 
     #if not write_level(level_s, name):
     #    raise("error writing level:",name)
@@ -392,8 +392,8 @@ def write_level_file(level_s, name):
 
 def generate_level(name):
     SNAKE_COUNT = 20 
-    WALL_COUNT = 200
-    VWALL_COUNT = 200
+    WALL_COUNT = 230
+    VWALL_COUNT = 230
 
     SNAKEHEAD = ['H'] * SNAKE_COUNT
     WALL = ['W'] *  WALL_COUNT
@@ -429,7 +429,7 @@ def generate_level(name):
         print("in memory creat mode", level_s)
         return level_s
     else:
-        print("writing generated level to file",name)
+        print("writing generated level to file:",name)
         ## gen level and wirte to file name
         write_level_file(level_s, name)
 
