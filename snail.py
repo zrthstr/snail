@@ -436,10 +436,6 @@ def init_game(game_type, level=False ):
         else:
             sys.exit("error, file not found:" + level)
 
-#def usage():
-#    print(sys.argv[0], " [--level <level_file> or --genlevel <level_file> or --test]")
-#    sys.exit()
-
 
 def game_setup():
     pygame.init()
@@ -465,36 +461,15 @@ def game_setup():
     if args.test:
         print("test mode!")
         init_game("test")
-    if args.genlevel:
+    elif args.genlevel:
         generate_level(args.genlevel)
         logger.debug("callin generating level:", args.genlevel)
         sys.exit()
-    if args.loadlevel:
-        init_game("level",loadlevel)
-
-
-    if len(sys.argv) == 1:
+    elif args.loadlevel:
+        init_game("level",args.loadlevel)
+    else:
         logging.info("running in random game mode mode:")
         init_game("random")
-
-
-#    elif len(sys.argv) == 2:
-#        if sys.argv[1] == "--test":
-#            logging.info("running in test mode:")
-#            init_game("test")
-#        else:
-#            usage()
-#
-#    elif len(sys.argv) == 3:
-#        if sys.argv[1] == "--genlevel":
-#            generate_level(sys.argv[2])
-#            sys.exit()
-#        elif sys.argv[1] == "--level":
-#            level = sys.argv[2]
-#            logging.info("loading level:", level)
-#            init_game("level",level)
-#        else:
-#            usage()
 
     return font, screen
 
