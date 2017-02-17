@@ -8,6 +8,8 @@ import os
 import os.path
 import random
 import sys
+import logging
+
 
 TITLE="Snail"
 
@@ -191,7 +193,6 @@ def snake_step(direc, i):
         snake[i] = snake[i][::-1]
     else:
         snake[i].insert(0, move_to(direc, snake[i][0]))
-        #print("iiii:",i)
         if snake_growing[i] > 0:
             snake_growing[i] -=1
         else:
@@ -200,7 +201,6 @@ def snake_step(direc, i):
 
 def move_snake():
     for i, this in enumerate(snake):
-        #print("in move_snake. this:",this,"i:",i )
         head = this[0]
 
         current_direction = get_current_direction(this)
@@ -229,14 +229,10 @@ def cut_snake(cut):
         for ii, ss in enumerate(s):
             if cut == ss:
                 if ii == 0:
-                    #print("CUT kill--  i:",i,"ii:",ii,"s:",s,"ss:",ss)
                     del snake[i]
                     del snake_growing[i]
                 else:
-                    #print("CUT cut--  i:",i,"ii:",ii,"s:",s,"ss:",ss)
-                    #print("cutting snake[i]:", snake[i], "to:", snake[i][:i])
                     snake[i] = snake[i][:ii]
-                #print("snakes:")
                 #for i, s in enumerate(snake):
                 #    print(s)
                 break
@@ -345,7 +341,6 @@ def parse_level(content):
                 expected %d lines. %d found." % (HIGHT, len(content)))
     for i, line in enumerate(content):
         if not len(line) == WIDTH:
-            #print("LLLAST LINE:",line,":", len(line))
             sys.exit("error, quitting. level file has line with bad lenght.\n\
                     in line %d. expected %d char. %d found." % (i, WIDTH, len(line)))
 
@@ -371,10 +366,10 @@ def parse_level(content):
                 snake.append([[x,y]])
                 snake_growing.append(random.randint(SNAKE_MIN_L, SNAKE_MAX_L))
     
-    print("player:",player)
-    print("wall:",wall)
-    print("snakheads:",snake)
-    print("level loaded.")
+    logging.info("player:",player)
+    logging.info("wall:",wall)
+    logging.info("snakheads:",snake)
+    logging.info("level loaded.")
 
 
 def write_level_file(level_s, name):
@@ -400,7 +395,7 @@ def generate_level(name):
     VWALL = ['V'] * VWALL_COUNT
     PLAYER = ['P'] * 1
     OUTERWALL = 2 * (HIGHT + WIDTH) - 4
-    print("OUT",OUTERWALL)
+    logging.info("OUT",OUTERWALL)
     VOID_COUNT = WIDTH * HIGHT - SNAKE_COUNT - WALL_COUNT - VWALL_COUNT - 1 - OUTERWALL
     VOID = [" "] * VOID_COUNT
 
@@ -410,26 +405,19 @@ def generate_level(name):
     ## make sure player is not on outer wall
 
     level_s = []
-    print("LENNN:",len(level))
+    logging.info("LENNN:",len(level))
 
     for i in range(0,len(level), WIDTH-2):
         if i == 0:
             level_s.append("W" * WIDTH)
-            print("...")
         level_s.append("W" + "".join(level[i:i+WIDTH-2]) + "W")
     level_s.append("W" * WIDTH)
 
-#    for i in range(0,len(level), WIDTH-2):
-#        if i == 0 or i == HIGHT - 1:
-#            level_s.append("W" * WIDTH)
-#        else:
-#            level_s.append("W" + "".join(level[i:i+WIDTH]) + "W")
-
     if not name:
-        print("in memory creat mode", level_s)
+        logging.info("in memory creat mode", level_s)
         return level_s
     else:
-        print("writing generated level to file:",name)
+        logging.info("writing generated level to file:",name)
         ## gen level and wirte to file name
         write_level_file(level_s, name)
 
@@ -459,12 +447,12 @@ def game_setup():
     font = pygame.font.Font(None, 17)
 
     if len(sys.argv) == 1:
-        print("running in random game mode mode:")
+        logging.info("running in random game mode mode:")
         init_game("random")
 
     elif len(sys.argv) == 2:
         if sys.argv[1] == "--test":
-            print("running in test mode:")
+            logging.info("running in test mode:")
             init_game("test")
         else:
             usage()
@@ -475,7 +463,7 @@ def game_setup():
             sys.exit()
         elif sys.argv[1] == "--level":
             level = sys.argv[2]
-            print("loading level:", level)
+            logging.info("loading level:", level)
             init_game("level",level)
         else:
             usage()
