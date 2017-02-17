@@ -3,6 +3,7 @@
 import pygame
 from pygame.locals import *
 
+import argparse
 import time
 import os
 import os.path
@@ -435,9 +436,9 @@ def init_game(game_type, level=False ):
         else:
             sys.exit("error, file not found:" + level)
 
-def usage():
-    print(sys.argv[0], " [--level <level_file> or --genlevel <level_file> or --test]")
-    sys.exit()
+#def usage():
+#    print(sys.argv[0], " [--level <level_file> or --genlevel <level_file> or --test]")
+#    sys.exit()
 
 
 def game_setup():
@@ -446,34 +447,61 @@ def game_setup():
     pygame.display.set_caption(TITLE)
     font = pygame.font.Font(None, 17)
 
+
+    arg_parser = argparse.ArgumentParser()
+    arg_group = arg_parser.add_mutually_exclusive_group()
+    arg_parser.add_argument("-v", "--verbose", action="store_true", help="increase verbosity level")
+    arg_group.add_argument("-t", "--test", action="store_true", help="runn in test mode")
+    arg_group.add_argument("-g", "--genlevel",  help="generate random level and safe to file")
+    arg_group.add_argument("-l", "--loadlevel",  help="play level from file")
+
+
+    args = arg_parser.parse_args()
+
+    if args.verbose:
+        print("should be verbose")
+        logger.setLevel(logging.DEBUG)
+
+    if args.test:
+        print("test mode!")
+        init_game("test")
+    if args.genlevel:
+        generate_level(args.genlevel)
+        logger.debug("callin generating level:", args.genlevel)
+        sys.exit()
+    if args.loadlevel:
+        init_game("level",loadlevel)
+
+
     if len(sys.argv) == 1:
         logging.info("running in random game mode mode:")
         init_game("random")
 
-    elif len(sys.argv) == 2:
-        if sys.argv[1] == "--test":
-            logging.info("running in test mode:")
-            init_game("test")
-        else:
-            usage()
 
-    elif len(sys.argv) == 3:
-        if sys.argv[1] == "--genlevel":
-            generate_level(sys.argv[2])
-            sys.exit()
-        elif sys.argv[1] == "--level":
-            level = sys.argv[2]
-            logging.info("loading level:", level)
-            init_game("level",level)
-        else:
-            usage()
+#    elif len(sys.argv) == 2:
+#        if sys.argv[1] == "--test":
+#            logging.info("running in test mode:")
+#            init_game("test")
+#        else:
+#            usage()
+#
+#    elif len(sys.argv) == 3:
+#        if sys.argv[1] == "--genlevel":
+#            generate_level(sys.argv[2])
+#            sys.exit()
+#        elif sys.argv[1] == "--level":
+#            level = sys.argv[2]
+#            logging.info("loading level:", level)
+#            init_game("level",level)
+#        else:
+#            usage()
 
     return font, screen
 
 
 
 if __name__ == "__main__":
-
+    logger = logging.getLogger('logger')
     font, screen = game_setup()
     frame = -1
     while True:

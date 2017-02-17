@@ -11,13 +11,6 @@ status="ok" ||
 status"[ test 1 failed"
 I=""
 
-test="++++     test 1    ++++"
-./snail.py --help &&
-status="ok" ||
-status="> test 1 failed"
-echo""
-
-
 test="++++     test 2    ++++"
 ./snail.py --test &&
 status="ok" ||
@@ -43,7 +36,7 @@ echo""
 
 
 test="++++     test 4    ++++"
-./snail.py --level $UTS &&
+./snail.py --loadlevel $UTS &&
 status="ok" ||
 status="> test 4 failed"
 echo""
@@ -52,7 +45,7 @@ rm $UTS
 
 
 test="++++     test 4.a    ++++"
-./snail.py --level"probably_not_existent" &&
+./snail.py --loadlevel"probably_not_existent" &&
 status="ok" ||
 status="> test 4.a failed"
 echo""
