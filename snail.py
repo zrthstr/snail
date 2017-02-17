@@ -16,11 +16,26 @@ TITLE="Snail"
 
 WIDTH = 60
 HIGHT = 40
-
-
-FACTOR = 12
-
+FACTOR = 12  
 FPS = 8
+
+GRAY = (159, 182, 205)
+BLUE   = (  0,  0,255)
+GREEN  = (  0,255,  0)
+DGREEN = ( 50,155, 50)
+RED    = (255,  0,  0)
+
+BG_COLOR = GRAY
+WALL_COLOR = BLUE
+SNAKE_COLOR = GREEN
+SNAKEHEAD_COLOR = DGREEN
+PLAYER_COLOR = RED
+
+PALYER_SYMBOL = "P"
+WALL_SYMBOL = "W"
+VWALL_SYMBOL = "V"
+SNAKEHEAD_SYMBOL = "H"
+
 
 player = []
 wall = []
@@ -29,12 +44,7 @@ snake = []
 wall_movable = []
 snake_growing = []
 
-
-BLUE   = (  0,  0,255)
-GREEN  = (  0,255,  0)
-DGREEN = ( 50,155, 50)
-RED    = (255,  0,  0)
-
+player_score = 0
 size = 20
 not_full = 0
 
@@ -53,11 +63,11 @@ SNAKE_MAX_L = 10
 
 # color, size, no_fill
 obj_size = int(FACTOR / 2)
-prop = {"player":  (RED,    obj_size, False),
-        "snake":   (GREEN,  obj_size, False),
-        "wall":    (BLUE,   obj_size, False),
-        "wall_movable":    (BLUE,   obj_size, True),
-        "snake_h": (DGREEN, obj_size, False)}
+visual_properties = {"player":  (PLAYER_COLOR,    obj_size, False),
+        "snake":   (SNAKE_COLOR,  obj_size, False),
+        "wall":    (WALL_COLOR,   obj_size, False),
+        "wall_movable":    (WALL_COLOR,   obj_size, True),
+        "snake_h": (SNAKEHEAD_COLOR, obj_size, False)}
 
 def test():
     global player
@@ -288,7 +298,7 @@ def draw_obj(obj, pos):
     #print("draw_obj:",pos)
     x = pos[0] * FACTOR
     y = pos[1] * FACTOR
-    color, size, not_full = prop[obj]
+    color, size, not_full = visual_properties[obj]
     pygame.draw.circle(screen, color, (x, y), size, not_full)
 
 
@@ -313,7 +323,7 @@ def draw_snake():
 
 
 def display(str):
-    screen.fill((159, 182, 205)) 
+    screen.fill(BG_COLOR) 
     draw_wall()
     draw_snake()
     draw_player()
@@ -351,19 +361,19 @@ def parse_level(content):
     global wall_movable
     global snake_growing
 
-    player = [[i, player.index("P")] for i, player in enumerate(content) if "P" in player ][0]
+    player = [[i, player.index(PLAYER_SYMBOL)] for i, player in enumerate(content) if PLAYER_SYMBOL in player ][0]
 
     for y, line in enumerate(content):
         for x, char in enumerate(line):
-            if char == "P":
+            if char == PLAYER_SYMBOL:
                 player = [x,y]
-            elif char == "W":
+            elif char == WALL_SYMBOL:
                 wall.append([x,y])
                 wall_movable.append(False)
-            elif char == "V":
+            elif char == VWALL_SYMBOL:
                 wall.append([x,y])
                 wall_movable.append(True)
-            elif char == "H":
+            elif char == SNAKEHEAD_SYMBOL:
                 snake.append([[x,y]])
                 snake_growing.append(random.randint(SNAKE_MIN_L, SNAKE_MAX_L))
     
@@ -410,9 +420,9 @@ def generate_level(name):
 
     for i in range(0,len(level), WIDTH-2):
         if i == 0:
-            level_s.append("W" * WIDTH)
-        level_s.append("W" + "".join(level[i:i+WIDTH-2]) + "W")
-    level_s.append("W" * WIDTH)
+            level_s.append(WALL_SYMBOL * WIDTH)
+        level_s.append(WALL_SYMBOL + "".join(level[i:i+WIDTH-2]) + WALL_SYMBOL)
+    level_s.append(WALL_SYMBOL * WIDTH)
 
     if not name:
         logging.info("in memory creat mode", level_s)
