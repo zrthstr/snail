@@ -19,34 +19,32 @@ HIGHT = 40
 FACTOR = 12  
 FPS = 8
 
-GRAY = (159, 182, 205)
+TEXT_SIZE = int(FACTOR * 1.5)
+
+GRAY =   (159,182,205)
 BLUE   = (  0,  0,255)
 GREEN  = (  0,255,  0)
 DGREEN = ( 50,155, 50)
 RED    = (255,  0,  0)
+WHITE =  (255,255,255)
+
+
 
 BG_COLOR = GRAY
 WALL_COLOR = BLUE
 SNAKE_COLOR = GREEN
 SNAKEHEAD_COLOR = DGREEN
 PLAYER_COLOR = RED
+TEXT_COLOR = WHITE
 
-PALYER_SYMBOL = "P"
+
+PLAYER_SYMBOL = "P"
 WALL_SYMBOL = "W"
 VWALL_SYMBOL = "V"
 SNAKEHEAD_SYMBOL = "H"
 
 
-player = []
-wall = []
-snake = []
-
-wall_movable = []
-snake_growing = []
-
-player_score = 0
-size = 20
-not_full = 0
+SNAKE_KILL_SCORE = 75
 
 
 DIRECTION = {
@@ -60,6 +58,19 @@ DIRECTION = {
 SNAKE_RANDOM = 7
 SNAKE_MIN_L = 3
 SNAKE_MAX_L = 10
+
+
+player = []
+wall = []
+snake = []
+
+wall_movable = []
+snake_growing = []
+
+player_score = 0
+size = 20
+not_full = 0
+
 
 # color, size, no_fill
 obj_size = int(FACTOR / 2)
@@ -236,12 +247,14 @@ def game_win():
 
 
 def cut_snake(cut):
+    global player_score
     for i, s in enumerate(snake):
         for ii, ss in enumerate(s):
             if cut == ss:
                 if ii == 0:
                     del snake[i]
                     del snake_growing[i]
+                    player_score += SNAKE_KILL_SCORE
                 else:
                     snake[i] = snake[i][:ii]
                 #for i, s in enumerate(snake):
@@ -322,17 +335,22 @@ def draw_snake():
         draw_obj("snake_h",one[0]) # head in dgreen
 
 
-def display(str):
+def display(frame):
+    info_text = "score: %12d  |  frame: %12d" % (player_score, frame)
     screen.fill(BG_COLOR) 
     draw_wall()
     draw_snake()
     draw_player()
-    text = font.render(str, True, (255, 255, 255), (159, 182, 205))
+    text = font.render(info_text, True, TEXT_COLOR )
+    #text.set_alpha(120)
     textRect = text.get_rect()
     textRect.centerx = screen.get_rect().centerx
-    textRect.centery = screen.get_rect().centery
+    textRect.bottom = screen.get_rect().bottom
     screen.blit(text, textRect)
     pygame.display.update()
+
+
+
 
 
 def handle_input():
@@ -451,7 +469,7 @@ def game_setup():
     pygame.init()
     screen = pygame.display.set_mode( (WIDTH * FACTOR - FACTOR , HIGHT * FACTOR - FACTOR) )
     pygame.display.set_caption(TITLE)
-    font = pygame.font.Font(None, 17)
+    font = pygame.font.Font(None, TEXT_SIZE)
 
 
     arg_parser = argparse.ArgumentParser()
@@ -494,7 +512,7 @@ if __name__ == "__main__":
         time.sleep(1 / FPS)
         move_player(handle_input())
         move_snake()
-        display(str(frame))
+        display(frame)
         pygame.event.clear()
     
         
