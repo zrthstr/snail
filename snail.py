@@ -84,7 +84,7 @@ def test():
     global player
     global wall
     global snake
-   
+
     global wall_movable
     global snake_growing
     player=[10,30]
@@ -110,7 +110,7 @@ def build_wall():
         for y in range(0,HIGHT):
             wall.append([x,y])
             wall_movable.append(False)
-        
+
     for y in [int(HIGHT/2 -6), int(HIGHT/2 +6)]:
         for x in range(0,WIDTH):
             wall.append([x,y])
@@ -129,7 +129,7 @@ def right(obj):
 
 def left(obj):
     return [obj[0] - 1, obj[1]]
-    
+
 def up(obj):
     return [obj[0], obj[1] -1]
 
@@ -271,7 +271,7 @@ def push_wall(player, brick):
         return player
     if any(new_brick in s for s in snake):
         cut_snake(new_brick)
-    
+
     brick_number = wall.index(brick)
     wall[brick_number] = new_brick
     return brick
@@ -351,8 +351,6 @@ def display(frame):
 
 
 
-
-
 def handle_input():
     key_press = pygame.event.get(KEYDOWN)
     if len(key_press) == 0:
@@ -394,7 +392,7 @@ def parse_level(content):
             elif char == SNAKEHEAD_SYMBOL:
                 snake.append([[x,y]])
                 snake_growing.append(random.randint(SNAKE_MIN_L, SNAKE_MAX_L))
-    
+
     logging.info("player:",player)
     logging.info("wall:",wall)
     logging.info("snakheads:",snake)
@@ -514,5 +512,4 @@ if __name__ == "__main__":
         move_snake()
         display(frame)
         pygame.event.clear()
-    
-        
+
