@@ -177,7 +177,7 @@ def opposite(direction):
 
 
 def get_current_direction(snake):
-    ### retourns random direction is snake len is one
+    ### returns random direction if snake len is one
     ### else returns the direction the snake is pointed
     ### directions are UP, DOWN, RIGHT, LEFT
     if len(snake) < 2:
@@ -337,7 +337,7 @@ def draw_snake():
 
 def display(frame):
     info_text = "score: %12d  |  frame: %12d" % (player_score, frame)
-    screen.fill(BG_COLOR) 
+    screen.fill(BG_COLOR)
     draw_wall()
     draw_snake()
     draw_player()
